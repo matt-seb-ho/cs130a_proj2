@@ -1,10 +1,6 @@
 #include <iostream>
 #include "heap.h"
 
-bool myLess(const int& l, const int& r) {
-	return l < r;
-}
-
 template <typename T>
 void printv(std::vector<T>& v) {
 	for (T& x : v) {
@@ -16,7 +12,10 @@ void printv(std::vector<T>& v) {
 int main() {
 	std::vector<int> v = {8, 2, 5, 7, 1, 3, 10};
 	printv(v);
-	Heap<int> h(MIN, &myLess);
+	/*
+	// Heap h(&myLess);
+	// empty heap test
+	// std::cout << h.get_min() << '\n';
 	for (int x : v) {
 		h.insert(x);
 	}
@@ -28,5 +27,6 @@ int main() {
 		std::cout << h.extract_root() << ", ";
 	}
 	std::cout << '\n';
+	*/
 	return 0;
 }

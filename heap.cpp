@@ -1,12 +1,13 @@
+#include "heap.h"
 #include <algorithm>
 #include <stdexcept>
 
-template <typename T>
-Heap<T>::Heap(HeapType ht, bool (*comp)(const T& l, const T& r))
-		: data(1), htype(ht), compare(comp) {}
+// ctor
+Heap::Heap(bool (*comp)(const int& l, const int& r))
+		: data(1), compare(comp) {}
 
-template <typename T>
-void Heap<T>::insert(T item) {
+// mutators
+void Heap::insert(int item) {
 	if (filled == data.size()) {
 		data.resize(data.size() * 2);
 	}
@@ -18,8 +19,7 @@ void Heap<T>::insert(T item) {
 	}
 }
 
-template <typename T>
-void Heap<T>::remove(T item) {
+void Heap::remove(int item) {
 	int index = find(item);
 	if (index == -1) {
 		return;
@@ -44,16 +44,8 @@ void Heap<T>::remove(T item) {
 	}
 }
 
-template <typename T>
-bool Heap<T>::search(T item) {
-	return find(item) != -1;
-}
-
-template <typename T>
-T Heap<T>::extract_root() {
-	if (filled == 0) {
-		throw std::runtime_error("cannot extract root from empty heap");
-	}
+int Heap::extract_root() {
+	checkEmpty("extract_root");
 	// swap root with rightmost leaf
 	std::swap(data[0], data[filled - 1]);
 
@@ -63,78 +55,45 @@ T Heap<T>::extract_root() {
 	return data[filled];
 }
 
-template <typename T>
-T Heap<T>::get_root() {
-	if (filled == 0) {
-		throw std::runtime_error("cannot get root from empty heap");
-	}
+// accessors
+bool Heap::search(int item) {
+	return find(item) != -1;
+}
+
+int Heap::get_root() {
+	checkEmpty("get_root");
 	return data[0];
 }
 
-template <typename T>
-T Heap<T>::get_min() {
-	if (filled == 0) {
-		throw std::runtime_error("cannot get min from empty heap");
-	}
-	if (htype == MIN) {
-		return data[0];
-	}
-	return otherExtreme;
+int Heap::get_min() {
+	return getExtreme(true);
 }
 
-template <typename T>
-T Heap<T>::get_max() {
-	if (filled == 0) {
-		throw std::runtime_error("cannot get max from empty heap");
-	}
-	if (htype == MAX) {
-		return data[0];
-	}
-	return otherExtreme;
+int Heap::get_max() {
+	return getExtreme(false);
 }
 
-template <typename T>
-int Heap<T>::get_size() {
+int Heap::get_size() {
 	return filled;
 }
 
-template <typename T>
-void Heap<T>::percDown(int index) {
-	// get index of extremum among index, left(index), and right(index)
-	int ex = index;
-	// examine left child
-	int child = 2 * index + 1;
-	if (child < filled && compare(data[child], data[ex])) {
-		ex = child;
-	}
-	// examine right child
-	child++;
-	if (child < filled && compare(data[child], data[ex])) {
-		ex = child;
-	}
+// helper routines
+void Heap::percDown(int index) {
+	// find correct parent among index and its children
+	int parent = getCorrectParent(index);
 
-	// work is done once data[index] is the extreme
-	while (ex != index) {
-		// swap items at ex and index 
-		std::swap(data[index], data[ex]);
+	// work is done once index is already the correct parent
+	while (parent != index) {
+		// swap correct parent into place 
+		std::swap(data[index], data[parent]);
 
-		// update ex for next iteration
-		index = ex;
-		// examine left child
-		int child = 2 * index + 1;
-		if (child < filled && compare(data[child], data[ex])) {
-			ex = child;
-		}
-		// examine right child
-		child++;
-		if (child < filled && compare(data[child], data[ex])) {
-			ex = child;
-		}
+		// update for next iteration
+		index = parent;
+		parent = getCorrectParent(index);
 	}
 }
 
-template <typename T>
-void Heap<T>::percUp(int index, bool toRoot) {
+void Heap::percUp(int index, bool toRoot) {
 	int parent = (index - 1) / 2;
 	while (parent != index && (toRoot || compare(data[index], data[parent]))) {
 		// swap up
@@ -146,12 +105,40 @@ void Heap<T>::percUp(int index, bool toRoot) {
 	}
 }
 
-template <typename T>
-int Heap<T>::find(T item) {
+int Heap::find(int item) {
 	for (int i = 0; i < filled; i++) {
 		if (data[i] == item) {
 			return i;
 		}
 	}
 	return -1;
+}
+
+void Heap::checkEmpty(std::string op) {
+	if (filled == 0) {
+		throw std::runtime_error("empty heap: invalid " + op + " operation");
+	}
+}
+
+int Heap::getExtreme(bool min) {
+	checkEmpty(min ? "get_min" : "get_max");
+	// flip comparison result if min is true
+	if ((data[0] > otherExtreme) != min) {
+		return data[0];
+	}
+	return otherExtreme;
+}
+
+int Heap::getCorrectParent(int parent) {
+	// examine left child
+	int child = 2 * parent + 1;
+	if (child < filled && compare(data[child], data[parent])) {
+		parent = child;
+	}
+	// examine right child
+	child++;
+	if (child < filled && compare(data[child], data[parent])) {
+		parent = child;
+	}
+	return parent;
 }

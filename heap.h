@@ -1,47 +1,49 @@
 #ifndef HEAP_H
 #define HEAP_H
 #include <vector>
+#include <string>
 
-enum HeapType {
-	MIN,
-	MAX,
-};
-
-template <typename T>
 class Heap {
 	public:
 		// ctor
-		Heap(HeapType ht, bool (*comp)(const T& l, const T& r));
+		Heap(bool (*comp)(const int& l, const int& r));
 
 		// mutators
-		void insert(T item);
-		void remove(T item);
-		bool search(T item);
-		T extract_root();
+		void insert(int item);
+		void remove(int item);
+		int extract_root();
 
 		// accessors
-		T get_root();
-		T get_min();
-		T get_max();
+		bool search(int item);
+		int get_root();
+		int get_min();
+		int get_max();
 		int get_size();
 
 	private:
 		// helper routines
 		void percDown(int index);
 		void percUp(int index, bool toRoot = false);
-		int find(T item);
+		int find(int item);
+		void checkEmpty(std::string op);
+
+		// returns min if min is true, otherwise returns max 
+		int getExtreme(bool min);
+	
+		// compares items at parent index and its left and right child, and
+		// returns the index of the item that should be the parent among the 3
+		int getCorrectParent(int parent);
+
 
 		// underlying data
-		std::vector<T> data;
-		HeapType htype;
+		std::vector<int> data;
 		int filled = 0;
-		T otherExtreme;
+		int otherExtreme;
 
 		// compare(a, b) returns
 		// - a < b for minHeap
 		// - a > b for maxheap
-		bool (*compare)(const T& l, const T& r);
+		bool (*compare)(const int& l, const int& r);
 };
 
-#include "heap.cpp"
 #endif

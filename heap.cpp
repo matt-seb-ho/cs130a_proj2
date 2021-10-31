@@ -36,9 +36,9 @@ void Heap<T>::remove(T item) {
 	// if otherExtreme was deleted, re-compute it
 	if (item == otherExtreme && filled > 0) {
 		otherExtreme = data[0];
-		for (const T& elem : data) {
-			if (compare(otherExtreme, elem)) {
-				otherExtreme = elem;
+		for (int i = 0; i < filled; i++) {
+			if (compare(otherExtreme, data[i])) {
+				otherExtreme = data[i];
 			}
 		}
 	}
@@ -51,7 +51,6 @@ bool Heap<T>::search(T item) {
 
 template <typename T>
 T Heap<T>::extract_root() {
-	T temp = data[0];
 	if (filled == 0) {
 		throw std::runtime_error("cannot extract root from empty heap");
 	}
@@ -61,7 +60,7 @@ T Heap<T>::extract_root() {
 	// decrement size and fix order property
 	filled--;
 	percDown(0);
-	return temp;
+	return data[filled];
 }
 
 template <typename T>
@@ -114,14 +113,13 @@ void Heap<T>::percDown(int index) {
 		ex = child;
 	}
 
-	// work is done once ex is at index
+	// work is done once data[index] is the extreme
 	while (ex != index) {
 		// swap items at ex and index 
 		std::swap(data[index], data[ex]);
 
 		// update ex for next iteration
 		index = ex;
-		ex = index;
 		// examine left child
 		int child = 2 * index + 1;
 		if (child < filled && compare(data[child], data[ex])) {
@@ -138,7 +136,7 @@ void Heap<T>::percDown(int index) {
 template <typename T>
 void Heap<T>::percUp(int index, bool toRoot) {
 	int parent = (index - 1) / 2;
-	while (parent >= 0 && (toRoot || compare(data[index], data[parent]))) {
+	while (parent != index && (toRoot || compare(data[index], data[parent]))) {
 		// swap up
 		std::swap(data[index], data[parent]);
 

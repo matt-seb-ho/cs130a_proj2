@@ -20,6 +20,9 @@ class M3Sketch {
 		bool search(int item);
 
 	private:
+		// helper routine
+		void rebalance();
+
 		// underlying data
 		Heap lower;
 		Heap upper;

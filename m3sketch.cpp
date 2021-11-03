@@ -12,11 +12,12 @@ M3Sketch::M3Sketch()
 		: lower(&myGreater), upper(&myLess) {}
 
 void M3Sketch::insert(int item) {
-	if (lower.get_size() <= upper.get_size()) {
+	if (get_size() == 0 || item < get_median()) {
 		lower.insert(item);
-		return;
+	} else {
+		upper.insert(item);
 	}
-	upper.insert(item);
+	rebalance();
 }
 
 void M3Sketch::remove(int item) {
@@ -25,12 +26,7 @@ void M3Sketch::remove(int item) {
 	} else {
 		upper.remove(item);
 	}
-	// re-balance
-	Heap& big = lower.get_size() > upper.get_size() ? lower : upper;
-	Heap& smol = lower.get_size() > upper.get_size() ? upper : lower;
-	if (big.get_size() - smol.get_size() > 1) {
-		smol.insert(big.extract_root());
-	}
+	rebalance();
 }
 
 int M3Sketch::get_median() {
@@ -56,3 +52,12 @@ bool M3Sketch::search(int item) {
 	Heap& heapToSearch = item <= get_median() ? lower : upper;
 	return heapToSearch.search(item);
 }
+
+void M3Sketch::rebalance() {
+	Heap& big = lower.get_size() > upper.get_size() ? lower : upper;
+	Heap& smol = lower.get_size() > upper.get_size() ? upper : lower;
+	if (big.get_size() - smol.get_size() > 1) {
+		smol.insert(big.extract_root());
+	}
+}
+	

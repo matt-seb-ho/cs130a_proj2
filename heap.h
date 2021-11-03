@@ -19,6 +19,7 @@ class Heap {
 		int get_min();
 		int get_max();
 		int get_size();
+		void report();
 
 	private:
 		// helper routines

@@ -1,8 +1,0 @@
-Min Heap:
-Size = 985
-Min = 54582
-Max = 99957
-Max Heap:
-Size = 985
-Min = 1028
-Max = 54515

@@ -1,5 +1,5 @@
 MinMedianMaxSketch:
 Size = 3949
-Min = 100283
+Min = 252
 Max = 999528
-Median = 546825
+Median = 495084

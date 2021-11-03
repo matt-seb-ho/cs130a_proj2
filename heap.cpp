@@ -1,6 +1,7 @@
 #include "heap.h"
-#include <algorithm>
 #include <stdexcept>
+#include <iostream>
+#include <algorithm> // std::swap
 
 // ctor
 Heap::Heap(bool (*comp)(const int& l, const int& r))
@@ -75,6 +76,12 @@ int Heap::get_max() {
 
 int Heap::get_size() {
 	return filled;
+}
+
+void Heap::report() {
+	std::cout << "Size = " << get_size() << '\n';
+	std::cout << "Min = " << get_min() << '\n';
+	std::cout << "Max = " << get_max() << '\n';
 }
 
 // helper routines

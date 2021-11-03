@@ -1,89 +1,54 @@
-#include <iostream>
-#include <fstream>
 #include "heap.h"
 #include "m3sketch.h"
-#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <stdexcept>
 
-template <typename T>
-void printv(std::vector<T>& v) {
-	for (T& x : v) {
-		std::cout << x << ", ";
+template <typename Functor>
+void processIntFile(char* fname, Functor functor) {
+	std::ifstream in(fname);
+	if (in.fail()) {
+		throw std::runtime_error("file open failed.\n");
 	}
-	std::cout << std::endl;
-}
-
-bool goodLess(const int& l, const int& r) {
-	return l < r;
-}
-
-bool goodGreater(const int& l, const int& r) {
-	return l > r;
-}
-
-void heapReport(Heap& h) {
-	std::cout << "Size = " << h.get_size() << '\n';
-	std::cout << "Min = " << h.get_min() << '\n';
-	std::cout << "Max = " << h.get_max() << '\n';
-}
-
-void m3Report(M3Sketch& m3) {
-	std::cout << "Size = " << m3.get_size() << '\n';
-	std::cout << "Min = " << m3.get_minimum() << '\n';
-	std::cout << "Max = " << m3.get_maximum() << '\n';
-	std::cout << "Median = " << m3.get_median() << '\n';
-}
-	
-int main(int argc, char* argv[]) {
-	std::vector<int> v = {8, 2, 5, 7, 1, 3, 10};
-	printv(v);
-
-	// Heap minH(&goodLess), maxH(&goodGreater);
-	std::vector<int> v2;
-	M3Sketch m3;
-	std::ifstream in(argv[1]);
 	int x;
-	int counter = 0;
 	while (in >> x) {
-		counter++;
-		m3.insert(x);
-		v2.push_back(x);
-		// minH.insert(x);
-		// maxH.insert(x);
+		functor(x);
 	}
 	in.close();
+}
 
-	m3Report(m3);
-
-	std::sort(v2.begin(), v2.end());
-	std::cout << "vec ver:\n";
-	std::cout << v2[0] << '\n';
-	std::cout << v2[v2.size() - 1] << '\n';
-	std::cout << v2[v2.size() / 2 - 1] << '\n';
-
-	/* 
-	std::cout << "counter: " << counter << '\n';
-	std::cout << "Min Heap:\n";
-	heapReport(minH);
-	std::cout << "Max Heap:\n";
-	heapReport(maxH);
-	*/
-
-	/*
-	// Heap h(&myLess);
-	// empty heap test
-	// std::cout << h.get_min() << '\n';
-	for (int x : v) {
-		h.insert(x);
+int main(int argc, char* argv[]) {
+	// Heap minH(&goodLess), maxH(&goodGreater);
+	if (argc != 4) {
+		std::cerr << "wrong number of args\n";
+	} else {
+		if (strcmp(argv[1], "heap") == 0) {
+			Heap minH(&M3Sketch::lessThan);
+			Heap maxH(&M3Sketch::greaterThan);
+			processIntFile(argv[2], [&](int x) {
+				minH.insert(x);
+				maxH.insert(x);
+			});
+			processIntFile(argv[3], [&](int x) {
+				minH.remove(x);
+				maxH.remove(x);
+			});
+			std::cout << "Min Heap:\n";
+			minH.report();
+			std::cout << "Max Heap:\n";
+			maxH.report();
+		} else if (strcmp(argv[1], "minmedianmax") == 0) {
+			M3Sketch m3;
+			processIntFile(argv[2], [&](int x) {
+				m3.insert(x);
+			});
+			processIntFile(argv[3], [&](int x) {
+				m3.remove(x);
+			});
+			std::cout << "MinMedianMaxSketch:\n";
+			m3.report();
+		}
 	}
-	std::cout << h.get_max() << '\n';
-	h.remove(10);
-	std::cout << "new max: " << h.get_max() << '\n';
-	int s = h.get_size();
-	for (int i = 0; i < s; i++) {
-		std::cout << h.extract_root() << ", ";
-	}
-	std::cout << '\n';
-	*/
-
 	return 0;
 }

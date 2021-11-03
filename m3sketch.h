@@ -18,6 +18,11 @@ class M3Sketch {
 		int get_maximum();
 		int get_size();
 		bool search(int item);
+		void report();
+
+		// compare functions for heaps
+		static bool lessThan(const int& l, const int& r);
+		static bool greaterThan(const int& l, const int& r);
 
 	private:
 		// helper routine

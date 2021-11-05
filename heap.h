@@ -3,21 +3,22 @@
 #include <vector>
 #include <string>
 
+template <typename T>
 class Heap {
 	public:
 		// ctor
-		Heap(bool (*comp)(const int& l, const int& r));
+		Heap(bool (*comp)(const T& l, const T& r));
 
 		// mutators
-		void insert(int item);
-		void remove(int item);
-		int extract_root();
+		void insert(T item);
+		void remove(T item);
+		T extract_root();
 
 		// accessors
-		bool search(int item);
-		int get_root();
-		int get_min();
-		int get_max();
+		bool search(T item);
+		T get_root();
+		T get_min();
+		T get_max();
 		int get_size();
 		void report();
 
@@ -25,11 +26,11 @@ class Heap {
 		// helper routines
 		void percDown(int index);
 		void percUp(int index, bool toRoot = false);
-		int find(int item);
+		int find(T item);
 		void checkEmpty(std::string op);
 
 		// returns min if min is true, otherwise returns max 
-		int getExtreme(bool min);
+		T getExtreme(bool min);
 	
 		// compares items at parent index and its left and right child, and
 		// returns the index of the item that should be the parent among the 3
@@ -37,14 +38,15 @@ class Heap {
 
 
 		// underlying data
-		std::vector<int> data;
+		std::vector<T> data;
 		int filled = 0;
-		int otherExtreme;
+		T otherExtreme;
 
 		// compare(a, b) returns
 		// - a < b for minHeap
 		// - a > b for maxheap
-		bool (*compare)(const int& l, const int& r);
+		bool (*compare)(const T& l, const T& r);
 };
 
+#include "heap.cpp"
 #endif

@@ -3,34 +3,38 @@
 
 #include "heap.h"
 
+template <typename T>
 class M3Sketch {
 	public:
 		// ctor
-		M3Sketch();
+		M3Sketch(
+			bool (*lt)(const T& l, const T& r), 
+			bool (*gt)(const T& l, const T& r));
 
 		// mutators
-		void insert(int item);
-		void remove(int item);
+		void insert(T item);
+		void remove(T item);
 
 		// accessors
-		int get_median();
-		int get_minimum();
-		int get_maximum();
+		T get_median();
+		T get_minimum();
+		T get_maximum();
 		int get_size();
-		bool search(int item);
+		bool search(T item);
 		void report();
-
-		// compare functions for heaps
-		static bool lessThan(const int& l, const int& r);
-		static bool greaterThan(const int& l, const int& r);
 
 	private:
 		// helper routine
 		void rebalance();
 
+		// compare functions for heaps
+		bool (*lessThan)(const T& l, const T& r);
+		bool (*greaterThan)(const T& l, const T& r);
+
 		// underlying data
-		Heap lower;
-		Heap upper;
+		Heap<T> lower;
+		Heap<T> upper;
 };
 
+#include "m3sketch.cpp"
 #endif

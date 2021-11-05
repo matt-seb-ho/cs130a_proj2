@@ -18,14 +18,21 @@ void processIntFile(char* fname, Functor functor) {
 	in.close();
 }
 
+bool intLessThan(const int& l, const int& r) {
+	return l < r;
+}
+bool intGreaterThan(const int& l, const int& r) {
+	return l > r;
+}
+
 int main(int argc, char* argv[]) {
 	// Heap minH(&goodLess), maxH(&goodGreater);
 	if (argc != 4) {
-		std::cerr << "wrong number of args\n";
+		std::cerr << "wrong number of args [data struct] [insert] [remove]\n";
 	} else {
 		if (strcmp(argv[1], "heap") == 0) {
-			Heap minH(&M3Sketch::lessThan);
-			Heap maxH(&M3Sketch::greaterThan);
+			Heap<int> minH(&intLessThan);
+			Heap<int> maxH(&intGreaterThan);
 			processIntFile(argv[2], [&](int x) {
 				minH.insert(x);
 				maxH.insert(x);
@@ -39,7 +46,7 @@ int main(int argc, char* argv[]) {
 			std::cout << "Max Heap:\n";
 			maxH.report();
 		} else if (strcmp(argv[1], "minmedianmax") == 0) {
-			M3Sketch m3;
+			M3Sketch<int> m3(&intLessThan, &intGreaterThan);
 			processIntFile(argv[2], [&](int x) {
 				m3.insert(x);
 			});

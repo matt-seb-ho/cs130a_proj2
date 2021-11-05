@@ -1,13 +1,16 @@
-#include "m3sketch.h"
 #include <iostream>
 
 // ctor
-M3Sketch::M3Sketch()
-		: lower(&greaterThan), upper(&lessThan) {}
+template <typename T>
+M3Sketch<T>::M3Sketch(
+		bool (*lt)(const T& l, const T& r), 
+		bool (*gt)(const T& l, const T& r))
+		: lessThan(lt), greaterThan(gt), lower(gt), upper(lt) {}
 
 // mutators
-void M3Sketch::insert(int item) {
-	if (get_size() == 0 || item < get_median()) {
+template <typename T>
+void M3Sketch<T>::insert(T item) {
+	if (get_size() == 0 || lessThan(item, get_median())) {
 		lower.insert(item);
 	} else {
 		upper.insert(item);
@@ -15,59 +18,66 @@ void M3Sketch::insert(int item) {
 	rebalance();
 }
 
-void M3Sketch::remove(int item) {
-	if (item <= get_median()) {
-		lower.remove(item);
+template <typename T>
+void M3Sketch<T>::remove(T item) {
+	Heap<int>* targetHeap;
+	if (lessThan(item, get_median())) {
+		targetHeap = &lower;
+	} else if (greaterThan(item, get_median())) {
+		targetHeap = &upper;
 	} else {
-		upper.remove(item);
+		targetHeap = lower.get_size() >= upper.get_size() ? &lower : &upper;
 	}
+	targetHeap->remove(item);
 	rebalance();
 }
 
 // accessors
-int M3Sketch::get_median() {
-	return lower.get_root();
+template <typename T>
+T M3Sketch<T>::get_median() {
+	if (lower.get_size() >= upper.get_size()) {
+		return lower.get_root();
+	}
+	return upper.get_root();
 }
 
-int M3Sketch::get_minimum() {
+template <typename T>
+T M3Sketch<T>::get_minimum() {
 	return lower.get_min();
 }
 
-int M3Sketch::get_maximum() {
+template <typename T>
+T M3Sketch<T>::get_maximum() {
 	return upper.get_max();
 }
 
-int M3Sketch::get_size() {
+template <typename T>
+int M3Sketch<T>::get_size() {
 	return lower.get_size() + upper.get_size();
 }
 
-bool M3Sketch::search(int item) {
-	if (item < get_minimum() || item > get_maximum()) {
+template <typename T>
+bool M3Sketch<T>::search(T item) {
+	if (lessThan(item, get_minimum()) || greaterThan(item, get_maximum())) {
 		return false;
 	}
-	Heap& heapToSearch = item <= get_median() ? lower : upper;
+	Heap<T>& heapToSearch = greaterThan(item, get_median())? upper : lower;
 	return heapToSearch.search(item);
 }
 
-void M3Sketch::report() {
+template <typename T>
+void M3Sketch<T>::report() {
 	std::cout << "Size = " << get_size() << '\n';
 	std::cout << "Min = " << get_minimum() << '\n';
 	std::cout << "Max = " << get_maximum() << '\n';
 	std::cout << "Median = " << get_median() << '\n';
 }
 	
-// heap compare functions
-bool M3Sketch::lessThan(const int& l, const int& r) {
-	return l < r;
-}
-bool M3Sketch::greaterThan(const int& l, const int& r) {
-	return l > r;
-}
-
 // helper routine
-void M3Sketch::rebalance() {
-	Heap& big = lower.get_size() > upper.get_size() ? lower : upper;
-	Heap& smol = lower.get_size() > upper.get_size() ? upper : lower;
+template <typename T>
+void M3Sketch<T>::rebalance() {
+	Heap<T>& big = lower.get_size() > upper.get_size() ? lower : upper;
+	Heap<T>& smol = lower.get_size() > upper.get_size() ? upper : lower;
 	if (big.get_size() - smol.get_size() > 1) {
 		smol.insert(big.extract_root());
 	}

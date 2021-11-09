@@ -4,8 +4,8 @@
 
 // ctor
 template <typename T>
-Heap<T>::Heap(bool (*comp)(const T& l, const T& r))
-		: data(1), compare(comp) {}
+Heap<T>::Heap(bool (*comp)(const T& l, const T& r), bool minHeap)
+		: data(1), isMinHeap(minHeap), compare(comp) {}
 
 // mutators
 template <typename T>
@@ -73,12 +73,14 @@ T Heap<T>::get_root() {
 
 template <typename T>
 T Heap<T>::get_min() {
-	return getExtreme(true);
+	checkEmpty("get_min");
+	return isMinHeap ? data[0] : otherExtreme;
 }
 
 template <typename T>
 T Heap<T>::get_max() {
-	return getExtreme(false);
+	checkEmpty("get_max");
+	return isMinHeap ? otherExtreme : data[0];
 }
 
 template <typename T>
@@ -138,16 +140,6 @@ void Heap<T>::checkEmpty(std::string op) {
 	if (filled == 0) {
 		throw std::runtime_error("empty heap: invalid " + op + " operation");
 	}
-}
-
-template <typename T>
-T Heap<T>::getExtreme(bool min) {
-	checkEmpty(min ? "get_min" : "get_max");
-	// flip comparison result if min is true
-	if ((data[0] > otherExtreme) != min) {
-		return data[0];
-	}
-	return otherExtreme;
 }
 
 template <typename T>

@@ -26,13 +26,12 @@ bool intGreaterThan(const int& l, const int& r) {
 }
 
 int main(int argc, char* argv[]) {
-	// Heap minH(&goodLess), maxH(&goodGreater);
 	if (argc != 4) {
 		std::cerr << "wrong number of args [data struct] [insert] [remove]\n";
 	} else {
 		if (strcmp(argv[1], "heap") == 0) {
-			Heap<int> minH(&intLessThan);
-			Heap<int> maxH(&intGreaterThan);
+			Heap<int> minH(&intLessThan, true);
+			Heap<int> maxH(&intGreaterThan, false);
 			processIntFile(argv[2], [&](int x) {
 				minH.insert(x);
 				maxH.insert(x);

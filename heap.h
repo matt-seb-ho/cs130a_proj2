@@ -7,7 +7,7 @@ template <typename T>
 class Heap {
 	public:
 		// ctor
-		Heap(bool (*comp)(const T& l, const T& r));
+		Heap(bool (*comp)(const T& l, const T& r), bool isMinHeap);
 
 		// mutators
 		void insert(T item);
@@ -29,9 +29,6 @@ class Heap {
 		int find(T item);
 		void checkEmpty(std::string op);
 
-		// returns min if min is true, otherwise returns max 
-		T getExtreme(bool min);
-	
 		// compares items at parent index and its left and right child, and
 		// returns the index of the item that should be the parent among the 3
 		int getCorrectParent(int parent);
@@ -40,6 +37,7 @@ class Heap {
 		// underlying data
 		std::vector<T> data;
 		int filled = 0;
+		bool isMinHeap;
 		T otherExtreme;
 
 		// compare(a, b) returns

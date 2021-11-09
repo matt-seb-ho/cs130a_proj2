@@ -5,7 +5,7 @@ template <typename T>
 M3Sketch<T>::M3Sketch(
 		bool (*lt)(const T& l, const T& r), 
 		bool (*gt)(const T& l, const T& r))
-		: lessThan(lt), greaterThan(gt), lower(gt), upper(lt) {}
+		: lessThan(lt), greaterThan(gt), lower(gt, false), upper(lt, true) {}
 
 // mutators
 template <typename T>
@@ -20,15 +20,10 @@ void M3Sketch<T>::insert(T item) {
 
 template <typename T>
 void M3Sketch<T>::remove(T item) {
-	Heap<int>* targetHeap;
-	if (lessThan(item, get_median())) {
-		targetHeap = &lower;
-	} else if (greaterThan(item, get_median())) {
-		targetHeap = &upper;
-	} else {
-		targetHeap = lower.get_size() >= upper.get_size() ? &lower : &upper;
+	if (lessThan(item, get_minimum()) || greaterThan(item, get_maximum())) {
+		return;
 	}
-	targetHeap->remove(item);
+	whichHalf(item)->remove(item);
 	rebalance();
 }
 
@@ -61,8 +56,7 @@ bool M3Sketch<T>::search(T item) {
 	if (lessThan(item, get_minimum()) || greaterThan(item, get_maximum())) {
 		return false;
 	}
-	Heap<T>& heapToSearch = greaterThan(item, get_median())? upper : lower;
-	return heapToSearch.search(item);
+	return whichHalf(item)->search(item);
 }
 
 template <typename T>
@@ -73,7 +67,7 @@ void M3Sketch<T>::report() {
 	std::cout << "Median = " << get_median() << '\n';
 }
 	
-// helper routine
+// helper routines
 template <typename T>
 void M3Sketch<T>::rebalance() {
 	Heap<T>& big = lower.get_size() > upper.get_size() ? lower : upper;
@@ -81,4 +75,16 @@ void M3Sketch<T>::rebalance() {
 	if (big.get_size() - smol.get_size() > 1) {
 		smol.insert(big.extract_root());
 	}
+}
+
+// determines which half an item might be in, returning &lower or &upper
+template <typename T>
+Heap<T>* M3Sketch<T>::whichHalf(T item) {
+	if (lessThan(item, get_median())) {
+		return &lower;
+	}
+	if (greaterThan(item, get_median())) {
+		return &upper;
+	}
+	return lower.get_size() >= upper.get_size() ? &lower : &upper;
 }

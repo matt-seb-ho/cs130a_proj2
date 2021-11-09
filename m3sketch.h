@@ -24,8 +24,9 @@ class M3Sketch {
 		void report();
 
 	private:
-		// helper routine
+		// helper routines
 		void rebalance();
+		Heap<T>* whichHalf(T item);
 
 		// compare functions for heaps
 		bool (*lessThan)(const T& l, const T& r);

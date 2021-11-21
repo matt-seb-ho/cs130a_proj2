@@ -1,0 +1,34 @@
+Project 2 requirements:
+x efficient (log time) insertion
+x constant time, min, max, median
+x search and remove (linear)
+	x deletion is log, but the search is linear
+	x when deleting, check if deleted max/min and update accordingly
+
+Heap
+x smaller than median goes in lower heap, upper otherwise
+x heaps shouldn't differ in size more than 1
+	x rebalance by remove root of big and insert into small
+x assume no duplicates
+x if heaps are equal size, median is root of lower
+
+Heap
+- ctor
+- insert
+- remove
+- get_root
+- extract_root
+- get_min
+- get_max
+- get_size
+- search
+
+M3
+- ctor
+- insert
+- remove
+- get_median
+- get_minimum
+- get_maximum
+- get_size
+- search
